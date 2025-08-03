@@ -14,6 +14,7 @@ const Contact = () => {
     <div className="row justify-content-center">
       <div className="col-lg-10 text-center">
         <h1 className="display-3 text-primary animated slideInDown">
+          
           Contact Us
         </h1>
         <p className="fs-5 text-white mb-4 pb-2">

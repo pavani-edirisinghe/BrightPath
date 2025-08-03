@@ -82,13 +82,14 @@ const MyCourses = () => {
                   <p>{course.description}</p>
                 </div>
                 <div className="course-actions">
-                  <button className="continue-btn">
+                   <button className="continue-btn" onClick={() => navigate(`/course/${course.id}`)}>
                     <i className="fas fa-play"></i> Continue
-                  </button>
-                  <button className="resources-btn">
+                   </button>
+                   <button className="resources-btn">
                     <i className="fas fa-download"></i> Resources
-                  </button>
+                   </button>
                 </div>
+
               </div>
             </div>
           ))}

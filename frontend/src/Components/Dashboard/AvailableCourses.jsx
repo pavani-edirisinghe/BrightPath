@@ -28,6 +28,11 @@ const AvailableCourses = () => {
     } else {
       document.body.style.overflow = 'auto';
     }
+    
+    // Cleanup function to restore scroll when component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, [showEditModal]);
 
   const formatDate = (dateString) => {
@@ -59,6 +64,12 @@ const AvailableCourses = () => {
     console.log('Editing course:', course);
     setEditingCourse(course);
     setShowEditModal(true);
+    console.log('Modal state after setting:', { showEditModal: true, editingCourse: course });
+  };
+  
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setEditingCourse(null);
   };
 
   const handleDelete = async (courseId) => {
@@ -73,37 +84,39 @@ const AvailableCourses = () => {
     }
   };
 
-const handleSaveCourse = async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
+  const handleSaveCourse = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
 
     const name = formData.get('name');
-  const description = formData.get('description');
-  const price = parseFloat(formData.get('price'));
-  const imageUrl = formData.get('imageUrl');
-  
-  
-  // Ensure date is properly formatted
-  const startDate = formData.get('startDate');
-  
-  // Create updated course object
-  const updatedCourse = {
-    name,
-    description,
-    startDate: startDate ? new Date(startDate).toISOString() : editingCourse.startDate,
-    price,
-    imageUrl
+    const description = formData.get('description');
+    const price = parseFloat(formData.get('price'));
+    const imageUrl = formData.get('imageUrl');
+    
+    // Ensure date is properly formatted
+    const startDate = formData.get('startDate');
+    
+    // Create updated course object
+    const updatedCourse = {
+      name,
+      description,
+      startDate: startDate ? new Date(startDate).toISOString() : editingCourse.startDate,
+      price,
+      imageUrl
+    };
+    
+    try {
+      await updateCourse(editingCourse.id, updatedCourse);
+      alert('Course updated successfully!');
+      handleCloseModal();
+      await refreshCourses();
+    } catch (error) {
+      alert(`Failed to update course: ${error.message}`);
+    }
   };
-  
-  try {
-    await updateCourse(editingCourse.id, updatedCourse);
-    alert('Course updated successfully!');
-    setShowEditModal(false);
-    await refreshCourses();
-  } catch (error) {
-    alert(`Failed to update course: ${error.message}`);
-  }
-};
+
+  // Debug logging
+  console.log('Component render - showEditModal:', showEditModal, 'editingCourse:', editingCourse);
 
   return (
     <div className="available-courses">
@@ -147,10 +160,28 @@ const handleSaveCourse = async (e) => {
                   </div>
                   {isAdmin && (
                     <div className="course-actions-admin">
-                      <button className="edit-btn" onClick={() => handleEdit(course)}>
+                      <button 
+                        className="edit-btn" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleEdit(course);
+                        }}
+                        type="button"
+                        title="Edit Course"
+                      >
                         <i className="fas fa-edit"></i>
                       </button>
-                      <button className="delete-btn" onClick={() => handleDelete(course.id)}>
+                      <button 
+                        className="delete-btn" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(course.id);
+                        }}
+                        type="button"
+                        title="Delete Course"
+                      >
                         <i className="fas fa-trash"></i>
                       </button>
                     </div>
@@ -164,26 +195,29 @@ const handleSaveCourse = async (e) => {
                     <h4>{course.name}</h4>
                     <p>{course.description}</p>
                   </div>
-                  <div className="course-enroll">
-                    {enrolled ? (
-                      <button className="enrolled-btn" disabled>
-                        <i className="fas fa-check"></i> Enrolled
-                      </button>
-                    ) : (
-                      <button className="enroll-btn" onClick={() => handleEnroll(course.id)} disabled={isEnrolling}>
-                        {isEnrolling ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm" role="status"></span>
-                            Enrolling...
-                          </>
-                        ) : (
-                          <>
-                            <i className="fas fa-plus"></i> Add to My Courses
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
+                  {!isAdmin && (
+  <div className="course-enroll">
+    {enrolled ? (
+      <button className="enrolled-btn" disabled>
+        <i className="fas fa-check"></i> Enrolled
+      </button>
+    ) : (
+      <button className="enroll-btn" onClick={() => handleEnroll(course.id)} disabled={isEnrolling}>
+        {isEnrolling ? (
+          <>
+            <span className="spinner-border spinner-border-sm" role="status"></span>
+            Enrolling...
+          </>
+        ) : (
+          <>
+            <i className="fas fa-plus"></i> Add to My Courses
+          </>
+        )}
+      </button>
+    )}
+  </div>
+)}
+
                 </div>
               </div>
             );
@@ -197,75 +231,108 @@ const handleSaveCourse = async (e) => {
         </Link>
       </div>
 
-      {/* Edit Modal */}
+      {/* Edit Modal - Now using CSS classes */}
       {showEditModal && editingCourse && (
-        <div className="modal-backdrop">
-          <div className="modal">
-            <div className="modal-header">
-              <h3>Edit Course</h3>
-              <button className="close-btn" onClick={() => setShowEditModal(false)}>&times;</button>
+        <div 
+          className="edit-modal-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleCloseModal();
+            }
+          }}
+        >
+          <div className="edit-modal-container">
+            {/* Modal Header */}
+            <div className="edit-modal-header">
+              <h3 className="edit-modal-title">Edit Course</h3>
+              <button 
+                onClick={handleCloseModal}
+                type="button"
+                className="edit-modal-close-btn"
+                title="Close"
+              >
+                ×
+              </button>
             </div>
-            <form onSubmit={handleSaveCourse}>
-              <div className="form-group">
-                <label>Course Name</label>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSaveCourse} className="edit-modal-body">
+              {/* Course Name */}
+              <div className="edit-modal-form-group">
+                <label className="edit-modal-label">Course Name</label>
                 <input
                   type="text"
                   name="name"
-                  defaultValue={editingCourse.name}
+                  defaultValue={editingCourse?.name || ''}
                   required
-                  className="form-control"
+                  className="edit-modal-input"
                 />
               </div>
 
-              <div className="form-group">
-                <label>Description</label>
+              {/* Description */}
+              <div className="edit-modal-form-group">
+                <label className="edit-modal-label">Description</label>
                 <textarea
                   name="description"
-                  defaultValue={editingCourse.description}
+                  defaultValue={editingCourse?.description || ''}
                   required
-                  className="form-control"
                   rows="3"
-                ></textarea>
+                  className="edit-modal-textarea"
+                />
               </div>
 
-              <div className="form-row">
-                <div className="form-group col-md-6">
-                  <label>Start Date</label>
+              {/* Date and Price Row */}
+              <div className="edit-modal-form-row">
+                <div className="edit-modal-form-col">
+                  <label className="edit-modal-label">Start Date</label>
                   <input
                     type="date"
                     name="startDate"
-                    defaultValue={editingCourse.startDate?.split?.('T')[0] || ''}
+                    defaultValue={editingCourse?.startDate?.split?.('T')[0] || ''}
                     required
-                    className="form-control"
+                    className="edit-modal-input"
                   />
                 </div>
-                <div className="form-group col-md-6">
-                  <label>Price (LKR)</label>
+                <div className="edit-modal-form-col">
+                  <label className="edit-modal-label">Price (LKR)</label>
                   <input
                     type="number"
                     name="price"
-                    defaultValue={editingCourse.price}
+                    defaultValue={editingCourse?.price || 0}
                     required
-                    className="form-control"
                     min="0"
                     step="0.01"
+                    className="edit-modal-input"
                   />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Image URL</label>
+              {/* Image URL */}
+              <div className="edit-modal-form-group">
+                <label className="edit-modal-label">Image URL</label>
                 <input
                   type="text"
                   name="imageUrl"
-                  defaultValue={editingCourse.imageUrl}
-                  className="form-control"
+                  defaultValue={editingCourse?.imageUrl || ''}
+                  className="edit-modal-input"
                 />
               </div>
 
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Changes</button>
+              {/* Modal Footer */}
+              <div className="edit-modal-footer">
+                <button 
+                  type="button" 
+                  onClick={handleCloseModal}
+                  className="edit-modal-btn edit-modal-btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="edit-modal-btn edit-modal-btn-primary"
+                >
+                  Save Changes
+                </button>
               </div>
             </form>
           </div>
@@ -276,3 +343,4 @@ const handleSaveCourse = async (e) => {
 };
 
 export default AvailableCourses;
+

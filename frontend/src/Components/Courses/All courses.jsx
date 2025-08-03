@@ -9,6 +9,7 @@ const AllCourses = () => {
   const { courses, loading, error } = useCourses();
   const { isEnrolled, enrollInCourse, loading: enrollmentLoading } = useEnrollment();
   const [enrollingCourseId, setEnrollingCourseId] = useState(null);
+  const [showFreeCoursesOnly, setShowFreeCoursesOnly] = useState(false); // New state for filter
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -35,6 +36,11 @@ const AllCourses = () => {
       setEnrollingCourseId(null);
     }
   };
+
+  // Filter courses based on showFreeCoursesOnly state
+  const filteredCourses = showFreeCoursesOnly 
+    ? courses.filter(course => course.price === 0) 
+    : courses;
 
   if (loading) {
     return (
@@ -65,20 +71,31 @@ const AllCourses = () => {
                 <div className="col-lg-12">
                   <div className="filters">
                     <ul>
-                      <li data-filter="all" className="active">All Courses</li>
-                      <li data-filter="soon">Coming Soon</li>
-                      <li data-filter="free">Free Courses</li>
+                      <li 
+                        data-filter="all" 
+                        className={!showFreeCoursesOnly ? "active" : ""}
+                        onClick={() => setShowFreeCoursesOnly(false)}
+                      >
+                        All Courses
+                      </li>
+                      <li 
+                        data-filter="Free" 
+                        className={showFreeCoursesOnly ? "active" : ""}
+                        onClick={() => setShowFreeCoursesOnly(true)}
+                      >
+                        Free Courses
+                      </li>
                     </ul>
                   </div>
                   <div className="col-lg-12">
                     <div className="row grid">
-                      {courses.length === 0 ? (
+                      {filteredCourses.length === 0 ? (
                         <div className="col-12 text-center py-5">
                           <h3>No courses available</h3>
                           <p>Check back later or contact us for upcoming courses</p>
                         </div>
                       ) : (
-                        courses.map(course => {
+                        filteredCourses.map(course => {
                           const formattedDate = formatDate(course.startDate);
                           const enrolled = isEnrolled(course.id);
                           const isEnrolling = enrollingCourseId === course.id;
@@ -90,7 +107,14 @@ const AllCourses = () => {
                                   <div className="price">
                                     <span>{course.price > 0 ? `LKR ${course.price}` : 'Free'}</span>
                                   </div>
-                                  <Link to={`/course/${course.id}`}>
+                                  <Link 
+                                    to={`/course/${course.id}`}
+                                    state={{ 
+                                      courseName: course.name, 
+                                      coursePrice: course.price, 
+                                      courseDate: course.startDate 
+                                    }}
+                                  >
                                     {course.imageUrl ? (
                                       <img src={course.imageUrl} alt={course.name} className="course-image" />
                                     ) : (
@@ -107,7 +131,14 @@ const AllCourses = () => {
                                     </h6>
                                   </div>
                                   <div className="content">
-                                    <Link to={`/course/${course.id}`}>
+                                    <Link 
+                                      to={`/course/${course.id}`}
+                                      state={{ 
+                                        courseName: course.name, 
+                                        coursePrice: course.price, 
+                                        courseDate: course.startDate 
+                                      }}
+                                    >
                                       <h4>{course.name}</h4>
                                     </Link>
                                     <p>{course.description}</p>
@@ -119,9 +150,10 @@ const AllCourses = () => {
                                   {/* Enrollment button below description */}
                                   <div className="enroll-section mt-3">
                                     {enrolled ? (
-                                      <button className="btn enrolled-btn w-100" disabled>
-                                        <i className="fas fa-check me-2"></i> Enrolled
-                                      </button>
+                                      <button className="enrolled-btn" disabled>
+                        <i className="fas fa-check"></i> Enrolled
+                      </button>
+                                      
                                     ) : (
                                       <button 
                                         className="btn enroll-btn w-100"
@@ -180,3 +212,4 @@ const AllCourses = () => {
 };
 
 export default AllCourses;
+

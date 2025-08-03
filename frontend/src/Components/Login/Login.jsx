@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import '../../assets/css/style.css';
@@ -23,14 +24,17 @@ const LoginPage = () => {
     }));
   };
 
-  const handleTogglePassword = (inputId) => {
-    const passwordInput = document.getElementById(inputId);
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-    } else {
-      passwordInput.type = 'password';
-    }
-  };
+  const passwordRef = useRef(null);
+
+const handleTogglePassword = () => {
+  const input = passwordRef.current;
+  if (input.type === 'password') {
+    input.type = 'text';
+  } else {
+    input.type = 'password';
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -110,20 +114,23 @@ const LoginPage = () => {
           <label htmlFor="password">Password</label>
           <div className="password-wrapper">
             <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Enter your password"
-              value={loginData.password}
-              onChange={handleChange}
-              required
-            />
+  type="password"
+  id="password"
+  name="password"
+  placeholder="Enter your password"
+  value={loginData.password}
+  onChange={handleChange}
+  required
+  ref={passwordRef}
+/>
+
             <span 
-              className="toggle-eye" 
-              onClick={() => handleTogglePassword('password')}
-            >
-              👁️
-            </span>
+  className="toggle-eye" 
+  onClick={handleTogglePassword}
+>
+  👁️
+</span>
+
           </div>
           
           <div className="options">

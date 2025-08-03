@@ -925,39 +925,251 @@
   border: 0;
 }
 
-/* Modal backdrop */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+/* Admin Course Actions */
+.course-actions-admin {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 5px;
+}
+
+.edit-btn, .delete-btn {
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s;
+  color: white;
 }
 
-/* Modal box */
-.modal {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  max-width: 600px;
-  width: 90%;
-  z-index: 1000;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
-  position: relative;
+.edit-btn {
+  background: #4a6cf7;
 }
 
-/* Close button */
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  position: absolute;
-  right: 1rem;
-  top: 1rem;
-  cursor: pointer;
+.edit-btn:hover {
+  background: #3a5be7;
+  transform: scale(1.1);
 }
+
+.delete-btn {
+  background: #dc3545;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+  transform: scale(1.1);
+}
+
+/* Modal Styles - Add these to your dashboard.css file */
+
+/* Modal Backdrop */
+.edit-modal-backdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 999999 !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+/* Modal Container */
+.edit-modal-container {
+  background-color: #ffffff !important;
+  border-radius: 12px !important;
+  max-width: 600px !important;
+  width: 90% !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+  position: relative !important;
+  z-index: 1000000 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Modal Header */
+.edit-modal-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 20px 25px !important;
+  border-bottom: 1px solid #dee2e6 !important;
+  background-color: #f8f9fa !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.edit-modal-title {
+  margin: 0 !important;
+  color: #343a40 !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+}
+
+.edit-modal-close-btn {
+  background: none !important;
+  border: none !important;
+  font-size: 24px !important;
+  cursor: pointer !important;
+  color: #6c757d !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  transition: all 0.2s !important;
+}
+
+.edit-modal-close-btn:hover {
+  background-color: #e9ecef !important;
+  color: #495057 !important;
+}
+
+/* Modal Body */
+.edit-modal-body {
+  padding: 25px !important;
+  display: block !important;
+}
+
+/* Form Groups */
+.edit-modal-form-group {
+  margin-bottom: 20px !important;
+  display: block !important;
+}
+
+.edit-modal-form-row {
+  display: flex !important;
+  gap: 15px !important;
+  margin-bottom: 20px !important;
+}
+
+.edit-modal-form-col {
+  flex: 1 !important;
+  display: block !important;
+}
+
+/* Labels */
+.edit-modal-label {
+  display: block !important;
+  margin-bottom: 8px !important;
+  font-weight: 600 !important;
+  color: #495057 !important;
+  font-size: 14px !important;
+}
+
+/* Input Fields */
+.edit-modal-input {
+  width: 100% !important;
+  padding: 10px 12px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  background-color: #ffffff !important;
+  color: #495057 !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+.edit-modal-input:focus {
+  border-color: #4a6cf7 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 0.2rem rgba(74, 108, 247, 0.25) !important;
+}
+
+/* Textarea */
+.edit-modal-textarea {
+  width: 100% !important;
+  padding: 10px 12px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  background-color: #ffffff !important;
+  color: #495057 !important;
+  resize: vertical !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+.edit-modal-textarea:focus {
+  border-color: #4a6cf7 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 0.2rem rgba(74, 108, 247, 0.25) !important;
+}
+
+/* Modal Footer */
+.edit-modal-footer {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  padding: 20px 0 0 0 !important;
+  border-top: 1px solid #dee2e6 !important;
+  margin-top: 20px !important;
+}
+
+/* Footer Buttons */
+.edit-modal-btn {
+  padding: 10px 20px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  min-width: 80px !important;
+  transition: all 0.2s !important;
+}
+
+.edit-modal-btn-secondary {
+  background-color: #6c757d !important;
+  color: white !important;
+}
+
+.edit-modal-btn-secondary:hover {
+  background-color: #5a6268 !important;
+}
+
+.edit-modal-btn-primary {
+  background-color: #4a6cf7 !important;
+  color: white !important;
+}
+
+.edit-modal-btn-primary:hover {
+  background-color: #3a5be7 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .edit-modal-container {
+    width: 95% !important;
+    margin: 10px !important;
+  }
+  
+  .edit-modal-form-row {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+  
+  .edit-modal-form-col {
+    margin-bottom: 20px !important;
+  }
+  
+  .edit-modal-header {
+    padding: 15px 20px !important;
+  }
+  
+  .edit-modal-body {
+    padding: 20px !important;
+  }
+}
+

@@ -16,6 +16,8 @@ import PrivacyPolicy from "./Components/Security/Privacy Policy";
 import TermofService from "./Components/Security/TermOfService";
 import Help from "./Components/Security/Help";
 import Dashboard from "./Components/Dashboard/Dashboard";
+import CourseDetail from './Components/CourseDetail/CourseDetail';
+import SpecialOffersDetail from './Components/Courses/SpecialOfferDetail';
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
         <Route path="/term-of-service" element={<TermofService />} />
         <Route path="/help" element={<Help />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/course/:courseId" element={<CourseDetail />} />
+        <Route path="/offer/:offerId" element={<SpecialOffersDetail />} />
       </Routes>
       <Footer />
     </Router>
