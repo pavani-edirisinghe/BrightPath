@@ -1173,3 +1173,34 @@
   }
 }
 
+.save-profile-btn {
+  background-color: #28a745; /* green */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  margin-right: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-profile-btn:hover {
+  background-color: #218838;
+}
+
+.cancel-profile-btn {
+  background-color: #dc3545; /* red */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cancel-profile-btn:hover {
+  background-color: #c82333;
+}
+

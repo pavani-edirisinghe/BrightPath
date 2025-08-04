@@ -85,4 +85,60 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
         }
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(
+            @PathVariable Long id,
+            @RequestBody User updatedUser
+    ) {
+        Optional<User> existingUserOpt = userService.findByIdOptional(id);
+        if (existingUserOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
+        }
+
+        User existingUser = existingUserOpt.get();
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setEmail(updatedUser.getEmail());
+
+        // Optional: update password only if provided
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+            existingUser.setPassword(updatedUser.getPassword());
+        }
+
+        User savedUser = userService.save(existingUser);
+        return ResponseEntity.ok(savedUser);
+    }
+
+    @PutMapping("/{id}/profile-image")
+    public ResponseEntity<?> updateProfileImage(
+            @PathVariable Long id,
+            @RequestParam("profileImage") MultipartFile profileImage
+    ) throws IOException {
+        System.out.println("Uploading profile image for user id: " + id);
+
+        Optional<User> optionalUser = userService.findByIdOptional(id);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
+        }
+
+        if (profileImage == null || profileImage.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "No image uploaded"));
+        }
+
+        User user = optionalUser.get();
+
+        // Save the image
+        String fileName = UUID.randomUUID() + "_" + profileImage.getOriginalFilename();
+        Path uploadPath = Paths.get(uploadDir);
+        Files.createDirectories(uploadPath);
+        Path filePath = uploadPath.resolve(fileName);
+        profileImage.transferTo(filePath.toFile());
+
+        user.setProfileImage(fileName);
+        User saved = userService.save(user);
+
+        return ResponseEntity.ok(Map.of("profileImage", saved.getProfileImage()));
+    }
+
+
 }

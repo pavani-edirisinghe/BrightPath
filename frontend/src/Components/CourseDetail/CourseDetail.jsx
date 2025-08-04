@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useCourses } from '../../context/CourseContext';
+import { useEnrollment } from '../../context/EnrollmentContext'; // Import useEnrollment
+import { useUser } from '../../context/UserContext'; // Import useUser
 import CourseHeader from '../CourseDetail/CourseHeader.jsx';
 
 const CourseDetail = () => {
   const { courseId } = useParams();
   const { courses, loading, error } = useCourses();
+  const { user } = useUser(); // Get user from context
+  const { isEnrolled, enrollInCourse, loading: enrollmentLoading } = useEnrollment(); // Get enrollment functions
   const [course, setCourse] = useState(null);
+  const [enrollingCourseId, setEnrollingCourseId] = useState(null);
 
   useEffect(() => {
     if (courses && courses.length > 0) {
@@ -15,17 +20,36 @@ const CourseDetail = () => {
     }
   }, [courses, courseId]);
 
+  const handleEnroll = async (courseId) => {
+    if (!user || !user.id) {
+      alert('Please login to enroll in courses');
+      return;
+    }
+    
+    try {
+      setEnrollingCourseId(courseId);
+      await enrollInCourse(user.id, courseId);
+      alert('Successfully enrolled in the course!');
+    } catch (error) {
+      alert(`Enrollment failed: ${error.message}`);
+    } finally {
+      setEnrollingCourseId(null);
+    }
+  };
+
   if (loading) return <p>Loading course details...</p>;
   if (error) return <p>Error loading course: {error}</p>;
   if (!course) return <p>Course not found.</p>;
 
-  // Format date for display
   const formattedDate = new Date(course.startDate).toLocaleDateString(
     'en-US', {
       month: 'short',
       day: 'numeric'
     }
   ).toUpperCase();
+
+  const enrolled = isEnrolled(course.id);
+  const isEnrolling = enrollingCourseId === course.id;
 
   return (
     <div className="course-detail-page">
@@ -107,10 +131,62 @@ const CourseDetail = () => {
                 </div>
 
                 <div className="col-lg-12">
-                  <div className="main-button-red">
-                    <a href="/courses">Back To Courses List</a>
-                  </div>
-                </div>
+  <div
+    className="main-button-red"
+    style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: '10px', 
+      flexWrap: 'wrap' 
+    }}
+  >
+    <Link
+      to="/courses"
+      style={{
+        textDecoration: 'none',
+        borderRadius: '20px',
+        fontWeight: '500',
+      }}
+    >
+      Back To Courses List
+    </Link>
+
+    {enrolled ? (
+      <button
+        className="enrolled-btn"
+        style={{ width: '200px', borderRadius: '20px', background: '#28a745', color: '#fff' }}
+        disabled
+      >
+        <i className="fas fa-check"></i> Enrolled
+      </button>
+      
+    ) : (
+      <button
+        className="btn enroll-btn"
+        style={{
+          width: '200px',
+        borderRadius: '20px',
+          fontWeight: '500',
+        }}
+        onClick={() => handleEnroll(course.id)}
+        disabled={isEnrolling}
+      >
+        {isEnrolling ? (
+          <>
+            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+            Enrolling...
+          </>
+        ) : (
+          <>
+            <i className="fas fa-plus me-2"></i> Enroll Now
+          </>
+        )}
+      </button>
+    )}
+  </div>
+</div>
+
 
               </div>
             </div>

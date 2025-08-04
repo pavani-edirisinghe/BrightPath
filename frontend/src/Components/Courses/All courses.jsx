@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCourses } from '../../context/CourseContext';
 import { useEnrollment } from '../../context/EnrollmentContext';
 import { useUser } from '../../context/UserContext';
@@ -9,7 +9,9 @@ const AllCourses = () => {
   const { courses, loading, error } = useCourses();
   const { isEnrolled, enrollInCourse, loading: enrollmentLoading } = useEnrollment();
   const [enrollingCourseId, setEnrollingCourseId] = useState(null);
-  const [showFreeCoursesOnly, setShowFreeCoursesOnly] = useState(false); // New state for filter
+  const [showFreeCoursesOnly, setShowFreeCoursesOnly] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const coursesPerPage = 6;
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -41,6 +43,17 @@ const AllCourses = () => {
   const filteredCourses = showFreeCoursesOnly 
     ? courses.filter(course => course.price === 0) 
     : courses;
+
+  // Calculate pagination
+  const indexOfLastCourse = currentPage * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+  const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [showFreeCoursesOnly]);
 
   if (loading) {
     return (
@@ -89,13 +102,13 @@ const AllCourses = () => {
                   </div>
                   <div className="col-lg-12">
                     <div className="row grid">
-                      {filteredCourses.length === 0 ? (
+                      {currentCourses.length === 0 ? (
                         <div className="col-12 text-center py-5">
                           <h3>No courses available</h3>
                           <p>Check back later or contact us for upcoming courses</p>
                         </div>
                       ) : (
-                        filteredCourses.map(course => {
+                        currentCourses.map(course => {
                           const formattedDate = formatDate(course.startDate);
                           const enrolled = isEnrolled(course.id);
                           const isEnrolling = enrollingCourseId === course.id;
@@ -116,7 +129,11 @@ const AllCourses = () => {
                                     }}
                                   >
                                     {course.imageUrl ? (
-                                      <img src={course.imageUrl} alt={course.name} className="course-image" />
+                                      <img 
+                                        src={`http://localhost:8081${course.imageUrl}`} 
+                                        alt={course.name} 
+                                        className="img-fluid"
+                                      />
                                     ) : (
                                       <div className="course-img-placeholder">
                                         <i className="fas fa-book"></i>
@@ -146,13 +163,11 @@ const AllCourses = () => {
                                   </div>
                                   
                                   <div>
-                                  
-                                  {/* Enrollment button below description */}
-                                  <div className="enroll-section mt-3">
-                                    {enrolled ? (
-                                      <button className="enrolled-btn" disabled>
-                        <i className="fas fa-check"></i> Enrolled
-                      </button>
+                                    <div className="enroll-section mt-3">
+                                      {enrolled ? (
+                                        <button className="enrolled-btn" disabled>
+                                          <i className="fas fa-check"></i> Enrolled
+                                        </button>
                                       
                                     ) : (
                                       <button 
@@ -184,20 +199,47 @@ const AllCourses = () => {
                   <div className="col-lg-12">
                     <div className="pagination">
                       <ul>
-                        <li>
-                          <a href="#meetings">1</a>
-                        </li>
-                        <li className="active">
-                          <a href="#meetings">2</a>
-                        </li>
-                        <li>
-                          <a href="#meetings">3</a>
-                        </li>
-                        <li>
-                          <a href="#meetings">
-                            <i className="fa fa-angle-right" />
-                          </a>
-                        </li>
+                        {/* Previous Page Button */}
+                        {currentPage > 1 && (
+                          <li>
+                            <button 
+                              onClick={() => setCurrentPage(currentPage - 1)}
+                              className="pagination-link"
+                            >
+                              <i className="fa fa-angle-left" />
+                            </button>
+                          </li>
+                        )}
+                        
+                        {/* Page Numbers 1, 2, 3 */}
+                        {[1, 2, 3].map(number => {
+                          if (number > totalPages) return null;
+                          return (
+                            <li 
+                              key={number} 
+                              className={currentPage === number ? "active" : ""}
+                            >
+                              <button 
+                                onClick={() => setCurrentPage(number)}
+                                className="pagination-link"
+                              >
+                                {number}
+                              </button>
+                            </li>
+                          );
+                        })}
+                        
+                        {/* Next Page Button */}
+                        {currentPage < totalPages && (
+                          <li>
+                            <button 
+                              onClick={() => setCurrentPage(currentPage + 1)}
+                              className="pagination-link"
+                            >
+                              <i className="fa fa-angle-right" />
+                            </button>
+                          </li>
+                        )}
                       </ul>
                     </div>
                   </div>
@@ -212,4 +254,3 @@ const AllCourses = () => {
 };
 
 export default AllCourses;
-

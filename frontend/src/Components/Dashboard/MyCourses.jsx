@@ -55,7 +55,7 @@ const MyCourses = () => {
           <p>Browse available courses and start your learning journey today!</p>
           <button 
             className="browse-btn"
-            onClick={() => navigate('/dashboard?panel=courses')}
+            onClick={() => navigate('/courses')}
           >
             Browse Courses
           </button>
@@ -66,7 +66,11 @@ const MyCourses = () => {
             <div className="course-card" key={course.id}>
               <div className="course-thumb">
                 {course.imageUrl ? (
-                  <img src={course.imageUrl} alt={course.name} />
+                  <img 
+  src={`http://localhost:8081${course.imageUrl}`} 
+  alt={course.name} 
+  
+/>
                 ) : (
                   <div className="course-placeholder">
                     <i className="fas fa-book"></i>

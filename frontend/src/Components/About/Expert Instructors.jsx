@@ -130,7 +130,7 @@ const Instructors = () => {
       <div className="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
         <div className="team-item " style={{ backgroundColor: "#c2eff0" }}>
           <div className="overflow-hidden">
-            <img className="img-fluid" src="img/17.jpg" alt="" />
+            <img className="img-fluid" src="img/16.jpg" alt="" />
           </div>
           <div
             className="position-relative d-flex justify-content-center"

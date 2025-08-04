@@ -149,12 +149,18 @@ const AvailableCourses = () => {
               <div className="course-card" key={course.id}>
                 <div className="course-thumb">
                   {course.imageUrl ? (
-                    <img src={course.imageUrl} alt={course.name} />
-                  ) : (
-                    <div className="course-placeholder">
-                      <i className="fas fa-book"></i>
-                    </div>
-                  )}
+ // Update the image URL in AvailableCourses.jsx
+<img 
+  src={`http://localhost:8081${course.imageUrl}`} 
+  alt={course.name} 
+  
+/>
+) : (
+  <div className="course-placeholder">
+    <i className="fas fa-book"></i>
+  </div>
+)}
+
                   <div className="course-price">
                     {course.price > 0 ? `LKR ${course.price}` : 'Free'}
                   </div>
