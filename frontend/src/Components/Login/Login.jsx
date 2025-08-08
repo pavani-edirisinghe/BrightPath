@@ -124,12 +124,9 @@ const handleTogglePassword = () => {
   ref={passwordRef}
 />
 
-            <span 
-  className="toggle-eye" 
-  onClick={handleTogglePassword}
->
-  👁️
-</span>
+            <span className="toggle-eye" onClick={handleTogglePassword}>
+              👁️
+              </span>
 
           </div>
           

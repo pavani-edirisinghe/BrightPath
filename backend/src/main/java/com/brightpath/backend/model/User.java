@@ -62,6 +62,5 @@ public class User {
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
-    // (Use Lombok if needed for brevity)
 
 }

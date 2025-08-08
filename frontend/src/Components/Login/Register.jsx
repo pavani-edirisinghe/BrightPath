@@ -5,6 +5,7 @@ import '../../assets/css/style.css';
 const RegisterPage = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const passwordRef = useRef(null); // ✅ Added for toggle
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -28,8 +29,6 @@ const RegisterPage = () => {
     const file = e.target.files[0];
     if (file) {
       setProfileImage(file);
-      
-      // Create preview URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result);
@@ -38,10 +37,19 @@ const RegisterPage = () => {
     }
   };
 
+  const handleTogglePassword = () => {
+    const input = passwordRef.current;
+    if (input.type === 'password') {
+      input.type = 'text';
+    } else {
+      input.type = 'password';
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (!formData.username || !formData.email || !formData.password) {
       setError('Please fill in all required fields');
       return;
@@ -49,33 +57,27 @@ const RegisterPage = () => {
 
     try {
       setIsLoading(true);
-      
-      // Create FormData to handle file upload
       const formDataToSend = new FormData();
       formDataToSend.append('username', formData.username);
       formDataToSend.append('email', formData.email);
       formDataToSend.append('password', formData.password);
-      
       if (profileImage) {
         formDataToSend.append('profileImage', profileImage);
       }
 
-      // Send registration data to Spring Boot backend
       const response = await fetch('http://localhost:8081/api/users/register', {
         method: 'POST',
         body: formDataToSend
       });
 
       const data = await response.json();
-      
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed');
       }
 
-      // Show success message and redirect to login
       alert('Registration successful! Please login.');
       navigate('/login');
-      
+
     } catch (err) {
       setError(err.message || 'An error occurred during registration');
       console.error('Registration error:', err);
@@ -97,9 +99,9 @@ const RegisterPage = () => {
           <button className="active">Register</button>
         </div>
         <br />
-        
+
         {error && <div className="error-message">{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
           {/* Profile Image Upload */}
           <div className="profile-upload">
@@ -112,7 +114,6 @@ const RegisterPage = () => {
                 />
               ) : (
                 <div className="upload-placeholder">
-                  
                   <p>Upload Photo</p>
                 </div>
               )}
@@ -159,9 +160,10 @@ const RegisterPage = () => {
               placeholder="Create a password"
               value={formData.password}
               onChange={handleChange}
+              ref={passwordRef} 
               required
             />
-            <span className="toggle-eye">👁️</span>
+            <span className="toggle-eye" onClick={handleTogglePassword}>👁️</span>
           </div>
 
           <div className="login-btn-wrapper">
